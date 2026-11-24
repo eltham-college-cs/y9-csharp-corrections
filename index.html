@@ -1,0 +1,913 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Assessment Corrections · Y9 C# Programming</title>
+<style>
+/* Layout: Eltham workbook frame (navy band header, white section cards), same house style as the
+   Y9 Searching code builder. One card per assessment question. No trace tables. */
+:root{
+  --navy9:#0A1B2E;--navy7:#163351;--navy5:#2A5A8C;--navy1:#D7E3EF;
+  --gold5:#C89B3C;--gold3:#E3C783;--gold7:#8A6520;
+  --paper:#F7F8FA;--card:#FFFFFF;--ink:#1A1D21;--muted:#555D68;--line:#E3E8EF;--frame:#B9C3CF;
+  --ok:#1F7A4D;--okbg:#E6F4EC;--bad:#B3261E;--badbg:#FCE9E7;--warn:#8A5A00;--warnbg:#FDF1D9;
+  --code-bg:#0E2033;--code-fg:#E4EAF1;--code-dim:#5E7389;--code-kw:#6FB3F2;--code-str:#E8A17A;--code-num:#B5CEA8;--code-fn:#E7DB9B;--code-type:#5FD1BC;--code-brace:#C89B3C;
+  --display:Georgia,"Times New Roman",serif;
+  --body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:ui-monospace,"Cascadia Mono",Consolas,"SF Mono",Menlo,monospace;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+html{scroll-behavior:smooth}
+[hidden]{display:none!important}
+body{background:var(--paper);color:var(--ink);font:16px/1.45 var(--body)}
+h1,h2,h3{font-family:var(--display);color:var(--navy9);font-weight:400;margin:0;text-wrap:balance}
+.wrap{max-width:1040px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 64px}
+header.top{background:var(--navy9);color:#fff;margin-bottom:22px}
+header.top .wrap{padding-block:22px 26px}
+.kicker{font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold3)}
+header.top h1{color:#fff;font-size:clamp(30px,5vw,44px);margin:6px 0 10px}
+header.top p{color:var(--navy1);margin:0;max-width:760px}
+.idrow{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px;align-items:flex-end}
+.idrow label{display:flex;flex-direction:column;font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--gold3)}
+.idrow input{margin-top:4px;padding:8px 10px;border-radius:8px;border:1px solid var(--navy5);background:var(--navy7);color:#fff;font:inherit;min-width:200px}
+.teacherbar{margin-top:14px;display:none;gap:10px;flex-wrap:wrap;align-items:center;background:var(--navy7);border:1px dashed var(--gold5);border-radius:10px;padding:8px 12px;color:var(--gold3);font-size:14px}
+body.teacher .teacherbar{display:flex}
+
+/* jump bar */
+.jump{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:22px}
+.jump p{margin:0 0 12px;color:var(--muted);font-size:15px;max-width:75ch}
+.jumphead{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:8px}
+.jumphead h2{font-size:22px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-weight:700;font-size:14px;min-width:46px;text-align:center;text-decoration:none;padding:7px 10px;border-radius:999px;border:1.5px solid var(--frame);background:#fff;color:var(--navy9)}
+.chip:hover,.chip:focus-visible{border-color:var(--navy5);outline:none;box-shadow:0 0 0 3px var(--gold3)}
+.chip.done{background:var(--okbg);border-color:#BFE0CC;color:var(--ok)}
+.chip.done::after{content:" ✓"}
+
+h2.group{font-size:26px;margin:30px 0 4px}
+p.groupnote{color:var(--muted);margin:0 0 14px;max-width:75ch}
+
+section.act{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 22px;margin-bottom:14px;scroll-margin-top:12px}
+section.act>header{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+section.act>header h2{font-size:24px;margin-right:6px}
+section.act>header h2 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+section.act>header h2 button::before{content:"▸";color:var(--gold5);display:inline-block;margin-right:8px;transition:transform .15s}
+section.act:not(.shut)>header h2 button::before{transform:rotate(90deg)}
+section.act>header h2 button:focus-visible{outline:3px solid var(--gold3);outline-offset:3px;border-radius:4px}
+section.act.shut .secbody{display:none}
+.secbody{margin-top:12px}
+.num{display:inline-block;min-width:34px;height:30px;padding:0 6px;border-radius:15px;background:var(--gold5);color:var(--navy9);text-align:center;line-height:30px;font-weight:700;font-size:15px}
+.pill{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.06em;padding:4px 10px;border-radius:999px;background:var(--gold5);color:var(--navy9)}
+.pill.navy{background:var(--navy9);color:var(--gold3)}
+.pill.model{background:#E3EEFB;color:#2F6FD6}
+.pill.must{background:var(--bad);color:#fff}
+.badge{margin-left:auto;font-size:13px;font-weight:700;color:var(--muted)}
+.badge.done{color:var(--ok)}
+.howto{color:var(--muted);font-size:15px;margin:0 0 14px;max-width:72ch}
+.howto b{color:var(--ink)}
+.rules{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+.rules span{font-size:13px;background:var(--warnbg);color:var(--warn);border-radius:8px;padding:5px 10px;font-weight:600}
+code{font-family:var(--mono)}
+.howto code,.task code,.fb code,.hintbox code,.why code,.answer code,.qtext code,.eg code,.jump code,.groupnote code{font-family:var(--mono);font-size:.92em;background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:0 4px;color:var(--navy7)}
+
+/* question text + example output */
+.qtext{margin:0 0 10px;max-width:72ch}
+.twocol{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:18px;margin-bottom:14px}
+@media (max-width:720px){.twocol{grid-template-columns:1fr}}
+.eg h3,.sub{font-family:var(--body);font-size:13px;font-weight:700;letter-spacing:.08em;color:var(--gold7);text-transform:uppercase;margin:0 0 6px}
+h3.sub{margin:18px 0 8px}
+.console{font-family:var(--mono);font-size:14px;background:var(--code-bg);color:#E4EAF1;border-radius:8px;padding:8px 12px;white-space:pre;overflow-x:auto;line-height:1.5}
+.console .in{color:#7FD49B}
+.eg .cap{font-size:13px;color:var(--muted);margin:6px 0 0}
+
+/* build rows */
+.rows{display:flex;flex-direction:column;gap:8px}
+.row{display:grid;grid-template-columns:34px minmax(0,1fr);gap:10px;align-items:start;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--card);transition:background .15s,border-color .15s}
+.row .ln{width:30px;height:30px;border-radius:15px;background:var(--navy9);color:var(--gold3);font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
+.row .main{min-width:0;display:flex;flex-direction:column;gap:6px}
+.row .task{font-weight:600;color:var(--navy9)}
+.row .does{font-size:14.5px;color:var(--muted)}
+.row .does b{color:var(--gold7);font-size:12px;letter-spacing:.08em;margin-right:4px}
+.entry{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.indent{font-family:var(--mono);color:var(--frame);font-size:14px;white-space:pre;user-select:none}
+.entry input{flex:1 1 280px;min-width:0;font-family:var(--mono);font-size:15px;padding:8px 10px;border-radius:8px;border:1.5px solid var(--frame);background:#FBFCFD;color:var(--ink)}
+.entry input:focus{outline:3px solid var(--gold3);outline-offset:1px;border-color:var(--navy5)}
+.entry input:disabled{background:var(--paper);color:var(--muted)}
+.row.right{background:var(--okbg);border-color:#BFE0CC}
+.row.right input{border-color:var(--ok);background:#fff}
+.row.wrong{background:var(--badbg);border-color:#F2C2BD}
+.row.wrong input{border-color:var(--bad)}
+.row.waiting{opacity:.55}
+.row.given{background:var(--paper);padding:6px 12px}
+.row.given .ln{background:var(--frame);color:#fff;width:24px;height:24px;font-size:12px;margin-left:3px}
+.givencode{font-family:var(--mono);font-size:14px;color:var(--navy7);white-space:pre;overflow-x:auto}
+.givenlabel{font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
+.row.bug:not(.right){border-color:#F2C2BD;border-width:2px}
+.bugline{font-family:var(--mono);font-size:14px;color:var(--bad);background:var(--badbg);border-radius:6px;padding:5px 9px;white-space:pre;overflow-x:auto;align-self:flex-start;max-width:100%}
+.buglabel{font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--bad);text-transform:uppercase}
+.why{font-size:15px;background:var(--warnbg);color:#5C3D00;border-radius:8px;padding:8px 10px}
+.why b{color:var(--warn)}
+button.btn{font:inherit;font-weight:700;font-size:14px;border-radius:8px;padding:8px 14px;cursor:pointer;border:1px solid var(--navy9);background:var(--navy9);color:#fff}
+button.btn.ghost{background:#fff;color:var(--navy9)}
+button.btn.gold{background:var(--gold5);border-color:var(--gold5);color:var(--navy9)}
+button.btn.model{display:none;background:#E3EEFB;border-color:#2F6FD6;color:#2F6FD6}
+body.teacher button.btn.model{display:inline-block}
+button.btn:disabled{opacity:.45;cursor:default}
+button.btn:focus-visible{outline:3px solid var(--gold3);outline-offset:2px}
+.fb{font-size:15px;font-weight:600}
+.fb.good{color:var(--ok)}
+.fb.bad{color:var(--bad)}
+.hintbox{font-size:14px;color:var(--warn);background:var(--warnbg);border-radius:8px;padding:6px 10px}
+
+/* assembled program */
+.prog{margin-top:18px}
+.proghead{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:8px}
+.proghead h3{font-size:20px}
+.legend{font-size:13px;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap}
+.legend i{font-style:normal;font-family:var(--mono);font-weight:700}
+.code{background:var(--code-bg);color:var(--code-fg);border-radius:12px;padding:14px 0;overflow-x:auto;font-family:var(--mono);font-size:14.5px;line-height:1.6}
+.code.small{font-size:14px;padding:10px 0;margin-bottom:12px}
+.code .cl{display:flex;white-space:pre;padding:0 16px;min-width:max-content}
+.code .cl .g{color:var(--code-dim);width:2.5em;text-align:right;margin-right:1.2em;flex:none;user-select:none}
+.code .cl.cur{background:rgba(200,155,60,.18);box-shadow:inset 4px 0 0 var(--gold5)}
+.code .cl.bugl{background:rgba(255,120,110,.16);box-shadow:inset 4px 0 0 #FF8A80}
+.code .ph{color:var(--code-dim);font-style:italic}
+.code .br{color:var(--code-brace);opacity:.85}
+.code .k{color:var(--code-kw)}.code .s{color:var(--code-str)}.code .n{color:var(--code-num)}.code .f{color:var(--code-fn)}.code .t{color:var(--code-type)}
+.donebar{display:none;margin-top:14px;background:var(--navy9);color:#fff;border-radius:12px;padding:14px 16px;gap:12px;flex-wrap:wrap;align-items:center}
+.donebar.on{display:flex}
+.donebar p{margin:0;color:var(--navy1);flex:1 1 260px}
+.donebar strong{color:var(--gold3)}
+
+/* multiple choice */
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:0 0 12px}
+.opt{display:flex;gap:10px;align-items:center;font:inherit;text-align:left;border:1.5px solid var(--line);border-radius:10px;padding:8px 12px;background:#fff;color:var(--ink)}
+.opt b{flex:none;width:26px;height:26px;border-radius:13px;background:var(--navy9);color:var(--gold3);display:flex;align-items:center;justify-content:center;font-size:13px}
+.opt code{font-size:15px}
+.opt.correct{background:var(--okbg);border-color:var(--ok)}
+.opt.correct b{background:var(--ok);color:#fff}
+button.opt{cursor:pointer;border-color:var(--frame)}
+button.opt:hover,button.opt:focus-visible{border-color:var(--navy5);outline:none;box-shadow:0 0 0 3px var(--gold3)}
+button.opt.wrongpick{background:var(--badbg);border-color:var(--bad)}
+button.opt.wrongpick b{background:var(--bad);color:#fff}
+button.opt:disabled{cursor:default;box-shadow:none}
+.answer{border:1px solid #BFE0CC;background:var(--okbg);border-radius:10px;padding:12px 14px;margin-bottom:6px}
+.answer .ans{font-family:var(--display);font-size:22px;color:var(--ok);margin:0 0 6px}
+.answer p{margin:0 0 8px;max-width:72ch}
+.answer p:last-child{margin-bottom:0}
+.answer ol,.answer ul{margin:0 0 8px;padding-left:22px}
+.answer .slip{color:#5C3D00;background:var(--warnbg);border-radius:8px;padding:6px 10px}
+.answer .enter{font-size:14px;color:var(--muted)}
+.tryq{border:2px dashed var(--frame);border-radius:12px;padding:14px;margin-top:14px;background:var(--paper)}
+.tryq h3{font-size:20px;margin-bottom:6px}
+.tryq .qtext{margin-bottom:10px}
+/* index strip */
+.strip{display:inline-grid;grid-auto-flow:column;gap:3px;margin:4px 0 10px;max-width:100%;overflow-x:auto;padding-bottom:2px}
+.strip .c{display:flex;flex-direction:column;align-items:center;min-width:34px}
+.strip .v{font-family:var(--mono);font-size:16px;background:#fff;border:1.5px solid var(--frame);border-radius:6px;padding:4px 8px;min-width:34px;text-align:center;white-space:pre}
+.strip .i{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;margin-top:2px}
+.strip .c.hi .v{background:var(--gold3);border-color:var(--gold7);font-weight:700}
+.strip .c.hi .i{color:var(--gold7);font-weight:700}
+.striplabel{font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--muted);text-transform:uppercase;display:block}
+
+.status{font-size:13px;color:var(--muted);margin-top:24px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+@media (max-width:640px){
+  section.act{padding:14px 12px}
+  section.act>header h2{font-size:21px}
+  .row{grid-template-columns:28px minmax(0,1fr);padding:8px}
+  .row .ln{width:26px;height:26px;font-size:13px}
+  .indent{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
+@media print{section.act.shut .secbody{display:block}button.btn,.jump{display:none}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <div class="kicker">Year 9 · Computer Science · C# Programming · End of unit assessment</div>
+  <h1>Assessment Corrections</h1>
+  <p>Use this page to correct every question you lost marks on. <b>Section A</b> tells you the answer, explains it, then gives you a new question to prove you have got it. <b>Section B</b> shows you which line is wrong and why. <b>Sections C, D and E</b> build the program one line at a time.</p>
+  <div class="idrow">
+    <label>NAME<input id="who" type="text" autocomplete="off" placeholder="First name and surname"></label>
+    <label>CLASS<input id="cls" type="text" autocomplete="off" placeholder="9G"></label>
+  </div>
+  <div class="teacherbar" id="teacherbar">Teacher mode: use ▶ Model on any line to type it live. <button class="btn gold" type="button" data-all="open">Open all</button> <button class="btn ghost" type="button" data-all="shut">Close all</button></div>
+</div></header>
+
+<main class="wrap" id="app">
+  <nav class="jump" aria-label="Questions">
+    <div class="jumphead"><h2>Which questions do you need to correct?</h2><span class="badge" id="overall"></span></div>
+    <p>Look at your marks on CodeBash. Click each question where you did not get full marks. A question turns green here when your correction is finished.</p>
+    <div class="chips" id="chips"></div>
+  </nav>
+</main>
+
+<script>
+/* ============================================================ helpers */
+const KW = new Set("using class static void int bool string double char for if else return new true false while break".split(" "));
+const $ = (s, el = document) => el.querySelector(s), $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const KEY = "y9-michaelmas-corrections-v1";
+let S; try { S = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) { S = {}; }
+S.ans = S.ans || {}; S.tries = S.tries || {}; S.mc = S.mc || {}; S.open = S.open || {};
+let saveT; function save(){ clearTimeout(saveT); saveT = setTimeout(() => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }, 150); }
+const TEACHER = /(^|[#?&])teacher\b/.test(location.hash + location.search);
+if (TEACHER) document.body.classList.add("teacher");
+
+/* ============================================================ tokeniser */
+const OPS = ["==","!=","<=",">=","++","--","&&","||","+=","-=","*=","/="];
+function tokens(src){
+  const out = []; let i = 0;
+  while (i < src.length){
+    const c = src[i];
+    if (/\s/.test(c)){ i++; continue; }
+    if (c === '"' || c === "'"){ let j = i + 1; while (j < src.length && src[j] !== c){ if (src[j] === "\\") j++; j++; } out.push({v: src.slice(i, j + 1), str: true, closed: j < src.length}); i = j + 1; continue; }
+    if (/[A-Za-z_]/.test(c)){ let j = i; while (j < src.length && /[A-Za-z0-9_]/.test(src[j])) j++; out.push({v: src.slice(i, j), id: true}); i = j; continue; }
+    if (/[0-9]/.test(c)){ let j = i; while (j < src.length && /[0-9.]/.test(src[j])) j++; out.push({v: src.slice(i, j), num: true}); i = j; continue; }
+    const two = src.slice(i, i + 2);
+    if (OPS.includes(two)){ out.push({v: two}); i += 2; continue; }
+    out.push({v: c}); i++;
+  }
+  return out;
+}
+const tv = ts => ts.map(t => t.v);
+const same = (a, b) => a.length === b.length && a.every((x, i) => x === b[i]);
+
+/* ============================================================ checker */
+function stripBraces(raw){
+  let s = raw.trim(), braces = false;
+  if (/^\}/.test(s)){ s = s.replace(/^\}\s*/, ""); braces = true; }
+  if (/\{\s*$/.test(s)){ s = s.replace(/\s*\{\s*$/, ""); braces = true; }
+  return {s, braces};
+}
+function matched(line, raw){
+  const V = tv(tokens(stripBraces(raw).s));
+  return [line.code, ...(line.alt || [])].find(c => same(V, tv(tokens(c)))) || line.code;
+}
+function count(ts, ch){ return ts.filter(t => t.v === ch).length; }
+function firstDiff(a, b){ let i = 0; while (i < a.length && i < b.length && a[i] === b[i]) i++; return i; }
+
+function check(line, raw){
+  const {s, braces} = stripBraces(raw);
+  const tip = braces ? " (No need to type { or } for a block: they are added for you.)" : "";
+  if (!s) return {ok:false, msg: braces ? "Leave the curly brackets out: type just the line of code." : "Type the line of code into the box first."};
+  const T = tokens(s), V = tv(T);
+  const targets = [line.code, ...(line.alt || [])].map(c => tv(tokens(c)));
+  if (targets.some(t => same(V, t))) return {ok:true, msg: "✓ Correct." + tip};
+  const E = targets[0], ET = tokens(line.code);
+
+  // 0. they typed the buggy line again
+  if (line.was && same(V, tv(tokens(line.was)))) return {ok:false, msg:"That is the buggy line, unchanged. Read <b>why it is wrong</b> above, then change just that part."};
+  // 1. capital letters
+  const lowerHit = targets.find(t => same(V.map(x => x.toLowerCase()), t.map(x => x.toLowerCase())));
+  if (lowerHit){
+    const i = V.findIndex((x, k) => x !== lowerHit[k]);
+    return {ok:false, msg:`C# is case-sensitive. Write <code>${esc(lowerHit[i])}</code>, not <code>${esc(V[i])}</code>.` + tip};
+  }
+  // 2. line-specific mistakes the class often makes
+  for (const [re, m] of (line.checks || [])) if (re.test(s)) return {ok:false, msg: m + tip};
+  // 3. unclosed text
+  const bad = T.find(t => t.str && !t.closed);
+  if (bad) return {ok:false, msg:`Your text is missing its closing quote mark.` + tip};
+  // 4. brackets that do not pair up
+  for (const [o, c, name] of [["(", ")", "round brackets ( )"], ["[", "]", "square brackets [ ]"]]){
+    if (count(T, o) !== count(T, c)) return {ok:false, msg:`Your ${name} do not pair up: you have ${count(T, o)} <code>${o}</code> and ${count(T, c)} <code>${c}</code>.` + tip};
+  }
+  // 5. semicolons
+  const wantSemi = E[E.length - 1] === ";", hasSemi = V[V.length - 1] === ";";
+  if (wantSemi && !hasSemi && targets.some(t => same([...V, ";"], t))) return {ok:false, msg:"Nearly. This line needs a semicolon <code>;</code> at the end." + tip};
+  if (!wantSemi && hasSemi) return {ok:false, msg:`Do not put <code>;</code> at the end of this line. A <code>;</code> after <code>${esc(E[0])} ( … )</code> ends it before its block starts.` + tip};
+  // 6. = instead of ==
+  if (E.includes("==") && !V.includes("==") && V.includes("=")) return {ok:false, msg:"To compare two values use <code>==</code>. A single <code>=</code> stores a value." + tip};
+  // 7. wrong text in quotes
+  const es = ET.filter(t => t.str).map(t => t.v), ss = T.filter(t => t.str).map(t => t.v);
+  if (es.length && ss.length && es.join() !== ss.join() && es.length === ss.length) return {ok:false, msg:`The text in quotes must be exactly <code>${esc(es.join(" and "))}</code>: check spelling, capitals and spaces.` + tip};
+  // 8. first difference against the closest accepted answer
+  const best = targets.reduce((b, t) => { const k = firstDiff(V, t); return k > b.k ? {k, t} : b; }, {k:-1, t:E});
+  const i = best.k, want = best.t;
+  if (i >= V.length) return {ok:false, msg: wantSemi && !hasSemi && V.length === want.length - 1 ? "Nearly. This line needs a semicolon <code>;</code> at the end." + tip : `Your line stops too early. Next it needs <code>${esc(want[i])}</code>.` + tip};
+  if (i >= want.length) return {ok:false, msg:`There is something extra at the end: <code>${esc(V.slice(i).join(" "))}</code>. Take it out.` + tip};
+  const after = i ? ` after <code>${esc(want.slice(Math.max(0, i - 2), i).join(" "))}</code>` : " at the start";
+  if (/^[A-Za-z_]/.test(want[i]) && /^[A-Za-z_]/.test(V[i])) return {ok:false, msg:`Check the word${after}: the instruction needs <code>${esc(want[i])}</code>, you wrote <code>${esc(V[i])}</code>.` + tip};
+  if (want.slice(i + 1).length && same(V.slice(i), want.slice(i + 1))) return {ok:false, msg:`Something is missing${after}: add <code>${esc(want[i])}</code>.` + tip};
+  return {ok:false, msg:`Look${after}: it should be <code>${esc(want[i])}</code>, you have <code>${esc(V[i])}</code>.` + tip};
+}
+
+/* ============================================================ shared line checks */
+const PRINT = [[/^print\s*\(/i, "<code>print</code> is Python. In C# use <code>Console.WriteLine( … );</code>"], [/Console\.Write\s*\(/, "Use <code>Console.WriteLine</code> so the output ends with a new line."], [/console\./, "C# is case-sensitive: <code>Console</code> has a capital C."]];
+const stepUp = (v) => [`${v}++`, `${v} += 1`, `${v} = ${v} + 1`, `++${v}`];
+const forAlts = (head, conds, v = "i") => conds.flatMap(c => stepUp(v).map(st => `for (${head}; ${c}; ${st})`));
+const HEAD = [
+  {k:"given", d:0, code:"using System;"},
+  {k:"blank"},
+  {k:"given", d:0, code:"class Program"},
+  {k:"given", d:1, code:"static void Main()"}
+];
+
+/* ============================================================ SECTION A: multiple choice
+   strip(cells, hi) draws the characters / items with their index underneath. */
+function strip(cells, hi = [], label = ""){
+  return `${label ? `<span class="striplabel">${label}</span>` : ""}<div class="strip" role="img" aria-label="${esc(cells.map((c, i) => `index ${i}: ${c === " " ? "space" : c}`).join(", "))}">${cells.map((c, i) => `<div class="c${hi.includes(i) ? " hi" : ""}"><span class="v">${c === " " ? "␣" : esc(c)}</span><span class="i">${i}</span></div>`).join("")}</div>`;
+}
+const MCQ = [
+ { id:"A1", title:"Count the Goes", prompt:"How many times does the body of this loop run?",
+   code:`for (int i = 2; i < 11; i += 3)\n{\n    Console.WriteLine(i);\n}`,
+   opts:["4","3","2","5"], ans:1,
+   explain:`<p><code>i</code> starts at 2. <code>i += 3</code> adds <b>3</b> each time (not 1). The body only runs while <code>i &lt; 11</code> is true.</p>
+     <ol><li><code>i = 2</code> → 2 &lt; 11 is true → runs</li><li><code>i = 5</code> → 5 &lt; 11 is true → runs</li><li><code>i = 8</code> → 8 &lt; 11 is true → runs</li></ol>
+     <p>Then <code>i = 11</code>. 11 &lt; 11 is <b>false</b>, so the loop stops. That is 3 runs.</p>
+     <p class="slip"><b>Common slip:</b> counting 11 as a fourth run. 11 is not less than 11.</p>`,
+   alt:{ prompt:"How many times does the body of this loop run?",
+     code:`for (int i = 1; i < 14; i += 4)\n{\n    Console.WriteLine(i);\n}`,
+     opts:[["3","Not quite. After 9 comes 13, and 13 < 14 is still true, so it runs once more."],
+           ["4","i is 1, 5, 9, 13: four runs. Then i is 17, and 17 < 14 is false, so it stops."],
+           ["5","Too many. After 13 comes 17, and 17 < 14 is false. The body does not run for 17."],
+           ["13","That is the last value of i that gets printed, not how many times the loop runs. Count the values: 1, 5, 9, 13."]], ans:1 } },
+ { id:"A2", title:"Doubling", prompt:"What does this program print?",
+   code:`int n = 1;\nwhile (n < 30)\n{\n    n = n * 2;\n}\nConsole.WriteLine(n);`,
+   opts:["16","30","32","64"], ans:2,
+   explain:`<p>Each time round the loop, <code>n</code> doubles: 1 → 2 → 4 → 8 → 16 → 32.</p>
+     <p>When <code>n</code> is 16, the check <code>16 &lt; 30</code> is still <b>true</b>, so it doubles once more to 32. Now <code>32 &lt; 30</code> is false, the loop ends, and 32 is printed.</p>
+     <p class="slip"><b>Common slip:</b> stopping at 16 because it is the last value below 30. A <code>while</code> loop only checks its condition at the top, so <code>n</code> can finish above 30.</p>`,
+   alt:{ prompt:"What does this program print?",
+     code:`int n = 3;\nwhile (n < 40)\n{\n    n = n * 2;\n}\nConsole.WriteLine(n);`,
+     opts:[["24","24 < 40 is still true, so the loop runs one more time and doubles 24."],
+           ["40","n is never 40. It goes 3, 6, 12, 24, 48. The 40 is only used in the check."],
+           ["48","3 → 6 → 12 → 24 → 48. At 24 the check is still true, so it doubles again. 48 < 40 is false, so it stops and prints 48."],
+           ["96","One doubling too many. When n is 48, the check 48 < 40 is false, so the loop has already stopped."]], ans:2 } },
+ { id:"A3", title:"Pick a Colour", prompt:"What does this program print?",
+   code:`string[] colours = {"red", "green", "blue", "pink"};\nConsole.WriteLine(colours[2]);`,
+   opts:["blue","green","pink","an error"], ans:0,
+   explain:`<p>Array indexes start at <b>0</b>, not 1. So <code>colours[2]</code> is the <b>third</b> item.</p>
+     ${strip(["red","green","blue","pink"], [2], "colours, with the index under each item")}
+     <p class="slip"><b>Common slip:</b> counting from 1 and choosing green.</p>`,
+   alt:{ prompt:"What does this program print?",
+     code:`string[] pets = {"cat", "dog", "fish", "hen", "owl"};\nConsole.WriteLine(pets[3]);`,
+     opts:[["fish","fish is the third item, but its index is 2. Indexes start at 0."],
+           ["hen","Indexes go cat 0, dog 1, fish 2, hen 3. So pets[3] is hen."],
+           ["owl","owl is at index 4, the last index (Length - 1)."],
+           ["an error","There are 5 items, so the indexes 0 to 4 all exist. Index 3 is fine."]], ans:1 } },
+ { id:"A4", title:"How Long?", prompt:"What does this program print?",
+   code:`int[] marks = new int[6];\nConsole.WriteLine(marks.Length);`,
+   opts:["5","7","0","6"], ans:3,
+   explain:`<p><code>new int[6]</code> makes an array with room for <b>6</b> numbers. <code>Length</code> tells you how many items the array has room for, so it prints 6.</p>
+     ${strip(["0","0","0","0","0","0"], [], "marks: 6 boxes, indexes 0 to 5")}
+     <p class="slip"><b>Common slips:</b> 5 is the <b>last index</b> (<code>Length - 1</code>), not the length. 0 is what each box holds to begin with, not how many boxes there are.</p>`,
+   alt:{ prompt:"What does this program print?",
+     code:`int[] ages = new int[9];\nages[0] = 12;\nConsole.WriteLine(ages.Length);`,
+     opts:[["8","8 is the last index (Length - 1). Length is the number of boxes."],
+           ["9","new int[9] makes 9 boxes. Storing 12 in one of them does not change how many boxes there are."],
+           ["10","The number in the square brackets is the length itself: 9."],
+           ["1","Only one box has been given a value, but the array still has room for 9. Length counts the boxes, not the ones you have filled."]], ans:1 } },
+ { id:"A5", title:"Cut It Out", prompt:"What does this program print?",
+   code:`string word = "Computer";\nConsole.WriteLine(word.Substring(3, 4));`,
+   opts:["put","pute","mpute","puter"], ans:1,
+   explain:`<p><code>Substring(start, howMany)</code>: the first number is the index to <b>start</b> at, the second is <b>how many characters</b> to take.</p>
+     ${strip([..."Computer"], [3,4,5,6], "word, with the index under each character")}
+     <p>Start at index 3 (<code>p</code>) and take 4 characters: <code>p</code> <code>u</code> <code>t</code> <code>e</code>.</p>
+     <p class="slip"><b>Common slips:</b> counting from 1 (starts at <code>m</code>), or treating the 4 as the index to stop at. The second number is a count.</p>`,
+   alt:{ prompt:"What does this program print?",
+     code:`string word = "Keyboard";\nConsole.WriteLine(word.Substring(2, 3));`,
+     opts:[["eyb","You started at e, which is index 1. Indexes start at 0, so index 2 is y."],
+           ["ybo","K is 0, e is 1, y is 2. Start at y and take 3 characters: y, b, o."],
+           ["yb","Right start, but the second number is how many characters to take: 3, not the index to stop at."],
+           ["yboard","That would be Substring(2) with no second number. The 3 limits it to 3 characters."]], ans:1 } },
+ { id:"A6", title:"Find the N", prompt:"What does this program print?",
+   code:`string s = "Year Nine";\nConsole.WriteLine(s.IndexOf("N"));`,
+   opts:["4","6","5","-1"], ans:2,
+   explain:`<p><code>IndexOf("N")</code> gives the index of the first <code>N</code>. Count from <b>0</b>, and remember the <b>space is a character too</b>.</p>
+     ${strip([..."Year Nine"], [5], "s, with the index under each character (␣ is the space)")}
+     <p class="slip"><b>Common slips:</b> 4 is the space. 6 comes from counting from 1. -1 would only be printed if there were no capital <code>N</code> at all.</p>`,
+   alt:{ prompt:"What does this program print?",
+     code:`string s = "Hello World";\nConsole.WriteLine(s.IndexOf("o"));`,
+     opts:[["4","H 0, e 1, l 2, l 3, o 4. IndexOf gives the first o it finds."],
+           ["5","Index 5 is the space. That is also what you get for o if you count from 1."],
+           ["7","There is an o at index 7, but IndexOf stops at the first match, which is earlier."],
+           ["-1","-1 means not found. There is an o in Hello World."]], ans:0 } }
+];
+
+/* ============================================================ SECTIONS B to E: code questions
+   kind: given (shown, not typed) · line (student types it)
+   d = indent depth: 0 class level, 1 inside class, 2 inside Main … braces come from depth changes
+   was = the buggy line being replaced · why = why it is wrong · missing = a line that was left out */
+const TASKS = [
+ /* ---------------- B: debug ---------------- */
+ { id:"B1", sec:"B", title:"Debug: One Short", marks:2, type:"DEBUG",
+   q:"This program should print every number from <code>1</code> up to <b>and including</b> the number typed in, one per line. When <code>5</code> is typed it only prints <code>1</code> to <code>4</code>.",
+   eg:{inp:["5"], out:"1\n2\n3\n4\n5"},
+   howto:"Only <b>one line</b> is wrong. The grey lines are correct: leave them alone.",
+   rows:[...HEAD,
+    {k:"given", d:2, code:"int n = Convert.ToInt32(Console.ReadLine());"},
+    {k:"line", d:2, was:"for (int i = 1; i < n; i++)", code:"for (int i = 1; i <= n; i++)", alt:[...forAlts("int i = 1", ["i <= n", "i < n + 1", "i < 1 + n", "n >= i"])].slice(1),
+      why:"<code>i &lt; n</code> means \"keep going while <code>i</code> is <b>less than</b> <code>n</code>\". When <code>i</code> reaches 5, <code>5 &lt; 5</code> is false, so the loop stops before printing 5. It is one short.",
+      task:"Retype the <code>for</code> line so the loop also runs when <code>i</code> is <b>equal to</b> <code>n</code>.",
+      hint:"Change one symbol: <code>&lt;</code> becomes <code>&lt;=</code> (less than <b>or equal to</b>).",
+      checks:[[/=<\s*n/, "The symbol is written <code>&lt;=</code>, with the <code>&lt;</code> first."], [/int\s+i\s*=\s*0/, "Leave the start alone: the first number printed must be 1, so <code>int i = 1</code>."], [/i\s*<\s*n\s*;/, "Still <code>i &lt; n</code>, so it still stops one short. Let it run when <code>i</code> equals <code>n</code> too."]]},
+    {k:"given", d:3, code:"Console.WriteLine(i);"}
+   ]},
+ { id:"B2", sec:"B", title:"Debug: Never-Ending Countdown", marks:2, type:"DEBUG",
+   q:"This program should count down from the number typed in to <code>1</code>, then print <code>Go!</code> It never stops: it prints the same number for ever.",
+   eg:{inp:["3"], out:"3\n2\n1\nGo!"},
+   howto:"Nothing here needs changing. A line is <b>missing</b>. The grey lines are correct: leave them alone.",
+   rows:[...HEAD,
+    {k:"given", d:2, code:"int n = Convert.ToInt32(Console.ReadLine());"},
+    {k:"given", d:2, code:"while (n > 0)"},
+    {k:"given", d:3, code:"Console.WriteLine(n);"},
+    {k:"line", d:3, missing:true, code:"n = n - 1;", alt:["n--;", "n -= 1;", "--n;", "n = n + -1;"],
+      why:"The loop keeps going while <code>n &gt; 0</code>, but nothing inside the loop ever changes <code>n</code>. If <code>n</code> starts at 3 it stays 3, so <code>n &gt; 0</code> is true for ever. That is an <b>infinite loop</b>.",
+      task:"Add the missing line: after printing, make <code>n</code> go <b>down by 1</b>.",
+      hint:"Pattern: <code>n = n - 1;</code> &nbsp;The new value of <code>n</code> is the old value take away 1.",
+      checks:[[/^int\s+n/, "<code>n</code> already exists. Do not write <code>int</code> again."], [/\+\s*1|\+\+|\+=/, "That makes <code>n</code> bigger, so it would never get down to 0. Take 1 away."], [/^n\s*-\s*1\s*;?$/, "<code>n - 1</code> works the answer out but does not store it. Put it back in <code>n</code>: <code>n = n - 1;</code>"], [/==/, "Here you are storing a value, so use one <code>=</code>."]]},
+    {k:"given", d:2, code:`Console.WriteLine("Go!");`}
+   ]},
+ { id:"B3", sec:"B", title:"Debug: Score Crash", marks:2, type:"DEBUG",
+   q:"This program should read <b>4</b> scores into an array, one per line, and print their total. Instead it crashes with an <code>IndexOutOfRangeException</code>.",
+   eg:{inp:["5","9","2","7"], out:"Total: 23"},
+   howto:"Only <b>one line</b> is wrong. The grey lines are correct: leave them alone.",
+   rows:[...HEAD,
+    {k:"given", d:2, code:"int[] scores = new int[4];"},
+    {k:"given", d:2, code:"int total = 0;"},
+    {k:"line", d:2, was:"for (int i = 0; i <= scores.Length; i++)", code:"for (int i = 0; i < scores.Length; i++)", alt:[...forAlts("int i = 0", ["i < scores.Length", "i <= scores.Length - 1", "i < 4", "i <= 3"])].slice(1),
+      why:"<code>scores</code> has 4 boxes, so its indexes are 0, 1, 2 and 3. <code>scores.Length</code> is 4. With <code>&lt;=</code> the loop also runs when <code>i</code> is 4, and <code>scores[4]</code> does not exist. Asking for an index that is not there causes the crash.",
+      task:"Retype the <code>for</code> line so the loop stops <b>before</b> <code>i</code> reaches <code>scores.Length</code>.",
+      hint:"Change one symbol: <code>&lt;=</code> becomes <code>&lt;</code>. The last index is always <code>Length - 1</code>.",
+      checks:[[/int\s+i\s*=\s*1/, "Leave the start alone: the first box is index 0, so <code>int i = 0</code>."], [/scores\.Length\s*\(/, "<code>Length</code> has no brackets on an array: write <code>scores.Length</code>."]]},
+    {k:"given", d:3, code:"scores[i] = Convert.ToInt32(Console.ReadLine());"},
+    {k:"given", d:3, code:"total = total + scores[i];"},
+    {k:"given", d:2, code:`Console.WriteLine("Total: " + total);`}
+   ]},
+ { id:"B4", sec:"B", title:"Debug: Surname Snip", marks:3, type:"DEBUG",
+   q:"This program reads a full name with one space in it. It should print the surname and how many letters it has. It has <b>two</b> errors: it will not build, and once it does, the surname starts with a space.",
+   eg:{inp:["Ada Lovelace"], out:"Surname: Lovelace\nLetters: 8"},
+   howto:"<b>Two lines</b> are wrong. The grey lines are correct: leave them alone.",
+   rows:[...HEAD,
+    {k:"given", d:2, code:"string full = Console.ReadLine();"},
+    {k:"given", d:2, code:`int space = full.IndexOf(" ");`},
+    {k:"line", d:2, was:"string surname = full.Substring(space);", code:"string surname = full.Substring(space + 1);", alt:["string surname = full.Substring(1 + space);"],
+      why:"<code>space</code> holds the index of the space itself (3 for <code>Ada Lovelace</code>). <code>Substring(space)</code> starts cutting <b>at</b> the space, so the surname comes out as <code>\" Lovelace\"</code> with a space on the front, and that space is counted as a letter. The surname really starts <b>one place after</b> the space.",
+      task:"Retype the line so the cut starts one place <b>after</b> the space.",
+      hint:"Start at <code>space + 1</code> instead of <code>space</code>.",
+      checks:[[/space\s*-\s*1/, "<code>space - 1</code> moves the start <b>back</b> into the first name. Go forwards one place: <code>space + 1</code>."], [/Substring\s*\(\s*space\s*,/, "No second number is needed: with one number, <code>Substring</code> takes everything to the end."], [/\.Trim\s*\(/, "<code>Trim()</code> would hide the problem. Fix where the cut starts instead: <code>space + 1</code>."]]},
+    {k:"given", d:2, code:`Console.WriteLine("Surname: " + surname);`},
+    {k:"line", d:2, was:`Console.WriteLine("Letters: " + surname.Length());`, code:`Console.WriteLine("Letters: " + surname.Length);`,
+      why:"This is the line that stops the program building. <code>Length</code> is a <b>property</b> (a fact about the string), not a method, so it has <b>no brackets</b>. Compare <code>word.ToUpper()</code>, which is a method and does need them.",
+      task:"Retype the line with the brackets after <code>Length</code> taken out.",
+      hint:"<code>surname.Length</code> with nothing after it, then the <code>)</code> that closes <code>WriteLine</code>.",
+      checks:[[/Length\s*\(/, "Still has brackets after <code>Length</code>. Remove both <code>(</code> and <code>)</code> so it reads <code>surname.Length</code>."], [/\.length/, "Capital L: <code>Length</code>."], ...PRINT]}
+   ]},
+
+ /* ---------------- C: complete ---------------- */
+ { id:"C1", sec:"C", title:"Complete: Times Table", marks:3, type:"COMPLETE",
+   q:"This program reads a number and prints its times table from <code>1</code> to <code>10</code>. Write the missing <code>for</code> loop header so that <code>i</code> goes from <code>1</code> to <code>10</code>.",
+   eg:{inp:["7"], out:"1 x 7 = 7\n2 x 7 = 14\n3 x 7 = 21\n…\n10 x 7 = 70"},
+   howto:"<b>One line</b> to write. The grey lines were given to you.",
+   rows:[...HEAD,
+    {k:"given", d:2, code:"int table = Convert.ToInt32(Console.ReadLine());"},
+    {k:"line", d:2, code:"for (int i = 1; i <= 10; i++)", alt:[...forAlts("int i = 1", ["i <= 10", "i < 11"])].slice(1),
+      task:"Write a <code>for</code> loop header: the counter <code>i</code> starts at <b>1</b>, the loop keeps going while <code>i</code> is <b>less than or equal to 10</b>, and <code>i</code> goes up by 1 each time.",
+      does:"A <code>for</code> header has three parts separated by <code>;</code> … where to start, when to keep going, how to count. The line below it runs once for each value of <code>i</code>: 1, 2, 3 … 10.",
+      hint:"Pattern: <code>for (int i = start; i &lt;= end; i++)</code>",
+      checks:[[/int\s+i\s*=\s*0/, "A times table starts at 1 x, not 0 x. Start the counter at 1."], [/i\s*<\s*10\s*;/, "<code>i &lt; 10</code> stops at 9, so the 10 x line is missing. Use <code>&lt;=</code>."], [/i\s*<=?\s*table/, "The loop always goes to 10. <code>table</code> is the number being multiplied, not where the loop ends."], [/^for\s*\(\s*i\s*=/, "Declare the counter inside the loop: <code>int i = 1</code>."], [/,/, "The three parts of a <code>for</code> header are separated by semicolons <code>;</code> not commas."], [/;\s*\)\s*$/, "There should be no <code>;</code> before the closing <code>)</code>."]]},
+    {k:"given", d:3, code:`Console.WriteLine(i + " x " + table + " = " + (i * table));`}
+   ]},
+ { id:"C2", sec:"C", title:"Complete: Password Gate", marks:3, type:"COMPLETE",
+   q:"This program keeps reading passwords until <code>sharp</code> is typed. Then it prints <code>Access granted</code> and how many attempts it took. Write the <code>while</code> condition, and add 1 to <code>attempts</code> inside the loop.",
+   eg:{inp:["abc","sharp"], out:"Access granted\nAttempts: 2"},
+   howto:"<b>Two lines</b> to write. The grey lines were given to you.",
+   rows:[...HEAD,
+    {k:"given", d:2, code:"string guess = Console.ReadLine();"},
+    {k:"given", d:2, code:"int attempts = 1;"},
+    {k:"line", d:2, code:`while (guess != "sharp")`, alt:[`while ("sharp" != guess)`, `while (!(guess == "sharp"))`, `while (guess.Equals("sharp") == false)`, `while (!guess.Equals("sharp"))`],
+      task:"Write the <code>while</code> line: keep going while <code>guess</code> is <b>not equal to</b> <code>\"sharp\"</code>.",
+      does:"A <code>while</code> loop repeats its block for as long as the condition is true. The condition is the reason to <b>carry on</b>, so here it is \"the guess is still wrong\".",
+      hint:"<code>!=</code> means \"is not equal to\". Text goes in double quotes.",
+      checks:[[/guess\s*==\s*"sharp"\s*\)$/, "<code>==</code> would repeat while the password is <b>right</b>. Keep going while it is wrong: use <code>!=</code>."], [/guess\s*!=\s*sharp/, "<code>sharp</code> is text, so it needs double quotes: <code>\"sharp\"</code>."], [/'sharp'/, "Text (a string) uses double quotes: <code>\"sharp\"</code>."], [/=!|<>/, "\"Not equal to\" in C# is written <code>!=</code>."], [/^if\b/, "This has to repeat, so it is a <code>while</code>, not an <code>if</code>."]]},
+    {k:"given", d:3, code:"guess = Console.ReadLine();"},
+    {k:"line", d:3, code:"attempts = attempts + 1;", alt:["attempts++;", "attempts += 1;", "++attempts;", "attempts = 1 + attempts;"],
+      task:"Add 1 to <code>attempts</code>.",
+      does:"Each time round the loop is one more guess, so the counter goes up by 1. <code>attempts</code> started at 1 because the first guess was read before the loop.",
+      hint:"Pattern: <code>attempts = attempts + 1;</code> &nbsp;The new value is the old value plus 1.",
+      checks:[[/^int\s+attempts/, "<code>attempts</code> already exists. Do not write <code>int</code> again."], [/^attempts\s*\+\s*1\s*;?$/, "<code>attempts + 1</code> works the answer out but does not store it. Put it back: <code>attempts = attempts + 1;</code>"], [/^attempts\s*=\s*1\s*;?$/, "That sets <code>attempts</code> back to 1 every time. Add 1 to what is already there."], [/==/, "Here you are storing a value, so use one <code>=</code>."]]},
+    {k:"given", d:2, code:`Console.WriteLine("Access granted");`},
+    {k:"given", d:2, code:`Console.WriteLine("Attempts: " + attempts);`}
+   ]},
+ { id:"C3", sec:"C", title:"Complete: Backwards", marks:3, type:"COMPLETE",
+   q:"This program reads <b>5</b> whole numbers into an array. Add a loop that prints the numbers in <b>reverse order</b>, one per line. Start at the last index.",
+   eg:{inp:["4","8","15","16","23"], out:"23\n16\n15\n8\n4"},
+   howto:"<b>Two lines</b> to write. The grey lines were given to you.",
+   rows:[...HEAD,
+    {k:"given", d:2, code:"int[] nums = new int[5];"},
+    {k:"given", d:2, code:"for (int i = 0; i < nums.Length; i++)"},
+    {k:"given", d:3, code:"nums[i] = Convert.ToInt32(Console.ReadLine());"},
+    {k:"line", d:2, code:"for (int i = nums.Length - 1; i >= 0; i--)",
+      alt:["int i = nums.Length - 1", "int i = 4"].flatMap(h => ["i >= 0", "i > -1"].flatMap(c => ["i--", "i -= 1", "i = i - 1", "--i"].map(st => `for (${h}; ${c}; ${st})`))).slice(1),
+      task:"Write a <code>for</code> loop header that counts <b>backwards</b>: <code>i</code> starts at the last index (<code>nums.Length - 1</code>), keeps going while <code>i</code> is <b>greater than or equal to 0</b>, and goes <b>down</b> by 1 each time (<code>i--</code>).",
+      does:"The same three parts as any <code>for</code> loop, run in reverse. The last index is always <code>Length - 1</code> (here 4), and the first index is 0, so <code>i</code> goes 4, 3, 2, 1, 0.",
+      hint:"Pattern: <code>for (int i = ????.Length - 1; i &gt;= 0; i--)</code>",
+      checks:[[/int\s+i\s*=\s*nums\.Length\s*;/, "<code>nums.Length</code> is 5, but the last index is 4. Start at <code>nums.Length - 1</code>."], [/i\s*>\s*0\s*;/, "<code>i &gt; 0</code> stops before index 0, so the first number typed in is never printed. Use <code>&gt;=</code>."], [/i\+\+|\+=/, "To count backwards <code>i</code> must go down: <code>i--</code>."], [/i\s*<=?\s*/, "Counting down, the loop keeps going while <code>i</code> is still <b>at least 0</b>: <code>i &gt;= 0</code>."], [/=>/, "\"Greater than or equal to\" is written <code>&gt;=</code>, with the <code>&gt;</code> first."], [/nums\.Length\s*\(/, "<code>Length</code> has no brackets: <code>nums.Length</code>."]]},
+    {k:"line", d:3, code:"Console.WriteLine(nums[i]);",
+      task:"Inside the loop: print the item at index <code>i</code> of <code>nums</code>.",
+      does:"Square brackets pick one item out of the array. As <code>i</code> counts down, this prints the last item first.",
+      hint:"<code>nums[i]</code> goes inside the brackets of <code>Console.WriteLine( … );</code>",
+      checks:[[/nums\s*\(\s*i\s*\)/, "Use square brackets to get an item from an array: <code>nums[i]</code>."], [/WriteLine\s*\(\s*i\s*\)/, "That prints the index (4, 3, 2 …), not the number stored there. Print <code>nums[i]</code>."], [/"nums\[i\]"/, "No quote marks: <code>nums[i]</code> is code, not text."], ...PRINT]}
+   ]},
+
+ /* ---------------- D: write ---------------- */
+ { id:"D1", sec:"D", title:"Word Facts", marks:4, type:"WRITE",
+   q:"Write a program that reads one word and prints four facts about it: the word in capitals, how many letters it has, its first letter, and its last letter.",
+   eg:{inp:["Computer"], out:"Capitals: COMPUTER\nLength: 8\nFirst: C\nLast: r"},
+   howto:"<b>Five lines</b>: one to read the word, then one for each fact. The labels must match the example exactly, including the space after each colon.",
+   rows:[...HEAD,
+    {k:"line", d:2, code:"string word = Console.ReadLine();",
+      task:"Read the word typed in and store it in a <code>string</code> variable called <code>word</code>.",
+      does:"<code>Console.ReadLine()</code> waits for a line of typing and hands it back as text. No <code>Convert</code> is needed because we want text.",
+      hint:"Pattern: <code>string name = Console.ReadLine();</code>",
+      checks:[[/Convert\.ToInt32/, "A word is text, so do not convert it to a number. Just <code>Console.ReadLine()</code>."], [/^word\s*=/, "This is a new variable, so start with its type: <code>string word = …</code>"], [/ReadLine\s*;?$/, "<code>ReadLine</code> is a method, so it needs brackets: <code>Console.ReadLine()</code>."], [/^String\b/, "Use a small s: <code>string</code>."]]},
+    {k:"line", d:2, code:`Console.WriteLine("Capitals: " + word.ToUpper());`,
+      task:"Print <code>Capitals: </code> followed by the word in capital letters.",
+      does:"<code>word.ToUpper()</code> gives a copy of the word in capitals. <code>+</code> joins the label and the result into one line of output.",
+      hint:"<code>ToUpper()</code> is a method, so it needs brackets. Join with <code>+</code>.",
+      checks:[[/ToUpper\s*(?!\()[;)+]/, "<code>ToUpper</code> is a method, so it needs brackets: <code>word.ToUpper()</code>."], [/"Capitals:"\s*\+/, "Add a space before the closing quote: <code>\"Capitals: \"</code>."], [/\.Upper\s*\(|\.upper\s*\(/, "In C# the method is <code>ToUpper()</code>."], ...PRINT]},
+    {k:"line", d:2, code:`Console.WriteLine("Length: " + word.Length);`,
+      task:"Print <code>Length: </code> followed by how many characters the word has.",
+      does:"<code>word.Length</code> is the number of characters. It is a property, so it has <b>no brackets</b>.",
+      hint:"<code>word.Length</code> with no brackets after it.",
+      checks:[[/Length\s*\(/, "<code>Length</code> has no brackets: write <code>word.Length</code>."], [/"Length:"\s*\+/, "Add a space before the closing quote: <code>\"Length: \"</code>."], ...PRINT]},
+    {k:"line", d:2, code:`Console.WriteLine("First: " + word[0]);`, alt:[`Console.WriteLine("First: " + word.Substring(0, 1));`],
+      task:"Print <code>First: </code> followed by the first character of the word.",
+      does:"Square brackets pick out one character by its index. The first character is always at index <b>0</b>.",
+      hint:"<code>word[0]</code>",
+      checks:[[/word\s*\[\s*1\s*\]/, "Index 1 is the <b>second</b> character. Indexes start at 0."], [/word\s*\(\s*0\s*\)/, "Use square brackets to pick a character: <code>word[0]</code>."], [/"First:"\s*\+/, "Add a space before the closing quote: <code>\"First: \"</code>."], ...PRINT]},
+    {k:"line", d:2, code:`Console.WriteLine("Last: " + word[word.Length - 1]);`, alt:[`Console.WriteLine("Last: " + word.Substring(word.Length - 1));`, `Console.WriteLine("Last: " + word.Substring(word.Length - 1, 1));`],
+      task:"Print <code>Last: </code> followed by the last character of the word.",
+      does:"Indexes start at 0, so the last index is always one less than the length. For <code>Computer</code> the length is 8 and the last index is 7.",
+      hint:"The index of the last character is <code>word.Length - 1</code>. Put that inside <code>word[ … ]</code>.",
+      checks:[[/word\s*\[\s*word\.Length\s*\]/, "<code>word[word.Length]</code> is one past the end and would crash. The last index is <code>word.Length - 1</code>."], [/word\s*\[\s*\d+\s*\]/, "Do not use a fixed number: the word could be any length. Use <code>word.Length - 1</code>."], [/word\s*\[\s*-\s*1\s*\]/, "<code>[-1]</code> works in Python but not in C#. Use <code>word.Length - 1</code>."], [/"Last:"\s*\+/, "Add a space before the closing quote: <code>\"Last: \"</code>."], ...PRINT]}
+   ]},
+ { id:"D2", sec:"D", title:"Top Score", marks:4, type:"WRITE",
+   q:"Write a program that makes an <code>int</code> array with room for <b>5</b> scores, uses a loop to read the 5 scores into it (one per line), prints the <b>highest</b> score, and prints how many scores are <b>above 50</b> (50 itself is not above 50).",
+   eg:{inp:["45","72","50","88","31"], out:"Highest: 88\nAbove 50: 2"},
+   howto:"<b>Eleven lines.</b> Set up the array and two variables, then one loop does three jobs for each score: read it, check if it is the highest so far, check if it is above 50. Print the two answers <b>after</b> the loop.",
+   rows:[...HEAD,
+    {k:"line", d:2, code:"int[] scores = new int[5];",
+      task:"Create an <code>int</code> array called <code>scores</code> with room for 5 numbers.",
+      does:"<code>new int[5]</code> makes 5 empty boxes (indexes 0 to 4), ready to be filled in.",
+      hint:"Pattern: <code>int[] name = new int[howMany];</code>",
+      checks:[[/^int\s+scores/, "<code>scores</code> holds many numbers, so its type is <code>int[]</code> (an array), not <code>int</code>."], [/new\s+int\s*\(/, "The size goes in square brackets: <code>new int[5]</code>."], [/=\s*\{/, "The scores are typed in later, so make an empty array with room for 5: <code>new int[5]</code>."]]},
+    {k:"line", d:2, code:"int highest = 0;",
+      task:"Create an <code>int</code> variable called <code>highest</code> and set it to <code>0</code>.",
+      does:"This remembers the biggest score seen so far. Scores are never below 0, so starting at 0 means the first real score will beat it.",
+      hint:"Pattern: <code>int name = value;</code>"},
+    {k:"line", d:2, code:"int above = 0;",
+      task:"Create an <code>int</code> variable called <code>above</code> and set it to <code>0</code>.",
+      does:"This is a counter for the scores above 50. A counter always starts at 0.",
+      hint:"Pattern: <code>int name = value;</code>"},
+    {k:"line", d:2, code:"for (int i = 0; i < scores.Length; i++)", alt:[...forAlts("int i = 0", ["i < scores.Length", "i <= scores.Length - 1", "i < 5", "i <= 4"])].slice(1),
+      task:"Start a <code>for</code> loop. <code>i</code> starts at 0, the loop keeps going while <code>i &lt; scores.Length</code>, and <code>i</code> goes up by 1 each time.",
+      does:"This visits every index of the array in turn: 0, 1, 2, 3, 4. Everything indented under it happens once per score.",
+      hint:"Pattern: <code>for (int i = 0; i &lt; ????.Length; i++)</code>",
+      checks:[[/<=\s*scores\.Length\s*;/, "<code>&lt;=</code> runs one step too far and crashes: the last index is <code>scores.Length - 1</code>. Use <code>&lt;</code>."], [/scores\.Length\s*\(/, "<code>Length</code> has no brackets: <code>scores.Length</code>."], [/int\s+i\s*=\s*1/, "The first box is index 0, so start at <code>int i = 0</code>."]]},
+    {k:"line", d:3, code:"scores[i] = Convert.ToInt32(Console.ReadLine());",
+      task:"Inside the loop: read a whole number from the keyboard and store it in <code>scores</code> at index <code>i</code>.",
+      does:"<code>Console.ReadLine()</code> gives text, <code>Convert.ToInt32( … )</code> turns it into a whole number, and <code>scores[i] =</code> puts it in the next box.",
+      hint:"<code>scores[i] = Convert.ToInt32(Console.ReadLine());</code> has two closing brackets before the <code>;</code>",
+      checks:[[/^scores\s*\[\s*i\s*\]\s*=\s*Console\.ReadLine/, "<code>Console.ReadLine()</code> gives text. Wrap it in <code>Convert.ToInt32( )</code> to turn it into an int."], [/^int\s/, "The array already exists. No type at the start: just <code>scores[i] = …</code>"], [/^scores\s*=/, "Store it in one box, not the whole array: <code>scores[i] = …</code>"], [/Convert\.ToInt32\s*\(\s*Console\.ReadLine\s*\(\s*\)\s*;?$/, "Close <code>Convert.ToInt32(</code> as well: the line ends <code>ReadLine());</code>"]]},
+    {k:"line", d:3, code:"if (scores[i] > highest)", alt:["if (highest < scores[i])"],
+      task:"Still inside the loop: <b>if</b> this score is greater than <code>highest</code>…",
+      does:"Compares the score just read with the best one seen so far.",
+      hint:"<code>if (scores[i] &gt; highest)</code> with no semicolon.",
+      checks:[[/^if\s+[^(]/, "The condition goes in round brackets: <code>if ( … )</code>"], [/scores\s*\(\s*i\s*\)/, "Use square brackets: <code>scores[i]</code>."]]},
+    {k:"line", d:4, code:"highest = scores[i];",
+      task:"…store this score in <code>highest</code>.",
+      does:"A new best score has been found, so it replaces the old one.",
+      hint:"The value on the right is stored in the variable on the left.",
+      checks:[[/^int\s+highest/, "<code>highest</code> already exists. Do not write <code>int</code> again."], [/^scores\s*\[\s*i\s*\]\s*=\s*highest/, "The other way round: the value on the right is stored in the variable on the left."], [/==/, "Here you are storing a value, so use one <code>=</code>."]]},
+    {k:"line", d:3, code:"if (scores[i] > 50)", alt:["if (50 < scores[i])", "if (scores[i] >= 51)"],
+      task:"Back in the loop (a separate <code>if</code>): <b>if</b> this score is greater than 50…",
+      does:"<code>&gt;</code> means strictly greater than, so a score of exactly 50 is <b>not</b> counted.",
+      hint:"<code>if (scores[i] &gt; 50)</code>",
+      checks:[[/>=\s*50/, "<code>&gt;=</code> would count a score of exactly 50, but 50 is not above 50. Use <code>&gt;</code>."], [/^else/, "This is a separate question about the same score, so use a plain <code>if</code>, not <code>else</code>."], [/^if\s+[^(]/, "The condition goes in round brackets: <code>if ( … )</code>"]]},
+    {k:"line", d:4, code:"above = above + 1;", alt:["above++;", "above += 1;", "++above;", "above = 1 + above;"],
+      task:"…add 1 to <code>above</code>.",
+      does:"One more score above 50 has been found, so the counter goes up by 1.",
+      hint:"Pattern: <code>above = above + 1;</code>",
+      checks:[[/^int\s+above/, "<code>above</code> already exists. Do not write <code>int</code> again."], [/^above\s*\+\s*1\s*;?$/, "That works the answer out but does not store it. Write <code>above = above + 1;</code>"]]},
+    {k:"line", d:2, code:`Console.WriteLine("Highest: " + highest);`,
+      task:"After the loop has finished: print <code>Highest: </code> followed by <code>highest</code>.",
+      does:"This comes after the loop so it prints once, when every score has been checked.",
+      hint:"Join text and a variable with <code>+</code>. Note the space before the closing quote.",
+      checks:[[/"Highest:"\s*\+/, "Add a space before the closing quote: <code>\"Highest: \"</code>."], [/"highest"\s*\)/, "<code>highest</code> is a variable, so no quote marks round it."], ...PRINT]},
+    {k:"line", d:2, code:`Console.WriteLine("Above 50: " + above);`,
+      task:"Print <code>Above 50: </code> followed by <code>above</code>.",
+      does:"Prints the counter. The <code>50</code> here is inside the quotes, so it is just part of the label.",
+      hint:"The label is exactly <code>\"Above 50: \"</code>.",
+      checks:[[/"Above 50:"\s*\+/, "Add a space before the closing quote: <code>\"Above 50: \"</code>."], ...PRINT]}
+   ]},
+ { id:"D3", sec:"D", title:"Vowel Counter", marks:4, type:"WRITE",
+   q:"Write a program that reads one word and prints how many vowels it has. The vowels are <code>a</code>, <code>e</code>, <code>i</code>, <code>o</code> and <code>u</code>. The word might contain capital letters: count those too.",
+   eg:{inp:["computer"], out:"Vowels: 3"},
+   howto:"<b>Seven lines.</b> Read the word, make it lower case, then loop through its characters one at a time, counting the vowels. Print the count <b>after</b> the loop.",
+   rows:[...HEAD,
+    {k:"line", d:2, code:"string word = Console.ReadLine();",
+      task:"Read the word typed in and store it in a <code>string</code> variable called <code>word</code>.",
+      does:"<code>Console.ReadLine()</code> hands back what was typed as text.",
+      hint:"Pattern: <code>string name = Console.ReadLine();</code>",
+      checks:[[/Convert\.ToInt32/, "A word is text, so do not convert it to a number."], [/^word\s*=/, "This is a new variable, so start with its type: <code>string word = …</code>"]]},
+    {k:"line", d:2, code:"word = word.ToLower();",
+      task:"Change <code>word</code> to lower case and store the result back in <code>word</code>.",
+      does:"Now <code>E</code> and <code>e</code> are both <code>e</code>, so we only need to check for the five small vowels. <code>ToLower()</code> makes a new copy, so it must be stored with <code>word =</code>.",
+      hint:"Pattern: <code>word = word.ToLower();</code>",
+      checks:[[/^word\.ToLower\s*\(\s*\)\s*;?$/, "<code>word.ToLower()</code> makes a lower-case copy but does not change <code>word</code>. Store it back: <code>word = word.ToLower();</code>"], [/^string\s+word/, "<code>word</code> already exists. Do not write <code>string</code> again."], [/ToLower\s*;/, "<code>ToLower</code> is a method, so it needs brackets: <code>ToLower()</code>."], [/\.Lower\s*\(|\.lower\s*\(/, "In C# the method is <code>ToLower()</code>."]]},
+    {k:"line", d:2, code:"int vowels = 0;",
+      task:"Create an <code>int</code> variable called <code>vowels</code> and set it to <code>0</code>.",
+      does:"A counter for the vowels found. It starts at 0 because none have been found yet.",
+      hint:"Pattern: <code>int name = value;</code>"},
+    {k:"line", d:2, code:"for (int i = 0; i < word.Length; i++)", alt:[...forAlts("int i = 0", ["i < word.Length", "i <= word.Length - 1"])].slice(1),
+      task:"Start a <code>for</code> loop. <code>i</code> starts at 0, keeps going while <code>i &lt; word.Length</code>, and goes up by 1 each time.",
+      does:"A string works like an array of characters. This visits every index of the word, from the first character to the last.",
+      hint:"Pattern: <code>for (int i = 0; i &lt; ????.Length; i++)</code>",
+      checks:[[/<=\s*word\.Length\s*;/, "<code>&lt;=</code> runs one step too far and crashes: the last index is <code>word.Length - 1</code>. Use <code>&lt;</code>."], [/word\.Length\s*\(/, "<code>Length</code> has no brackets: <code>word.Length</code>."], [/int\s+i\s*=\s*1/, "The first character is index 0, so start at <code>int i = 0</code>."]]},
+    {k:"line", d:3, code:"if (word[i] == 'a' || word[i] == 'e' || word[i] == 'i' || word[i] == 'o' || word[i] == 'u')",
+      alt:[`if ("aeiou".IndexOf(word[i]) != -1)`, `if ("aeiou".IndexOf(word[i]) >= 0)`],
+      task:"Inside the loop: <b>if</b> the character at index <code>i</code> is equal to <code>'a'</code> <b>or</b> <code>'e'</code> <b>or</b> <code>'i'</code> <b>or</b> <code>'o'</code> <b>or</b> <code>'u'</code> (in that order)…",
+      does:"<code>word[i]</code> is one character. <code>||</code> means <b>or</b>. Each side of an <code>||</code> must be a full comparison, so <code>word[i] ==</code> is written out five times. A single character goes in <b>single</b> quotes.",
+      hint:"<code>if (word[i] == 'a' || word[i] == 'e' || …)</code> and carry on for <code>'i'</code>, <code>'o'</code> and <code>'u'</code>.",
+      checks:[[/==\s*"[a-z]"/, "<code>word[i]</code> is a single character (a <code>char</code>), so compare it with single quotes: <code>'a'</code>, not <code>\"a\"</code>."], [/\|\|\s*'/, "Each side of <code>||</code> must be a full comparison: write <code>word[i] == 'e'</code>, not just <code>'e'</code>."], [/\bor\b/, "<code>or</code> is Python. In C# \"or\" is written <code>||</code>."], [/&&/, "<code>&amp;&amp;</code> means <b>and</b>. One character cannot be a and e at once. Use <code>||</code> (or)."], [/[^|]\|[^|]/, "\"Or\" needs two bars: <code>||</code>."], [/word\s*==/, "Compare one character, not the whole word: <code>word[i]</code>."]]},
+    {k:"line", d:4, code:"vowels = vowels + 1;", alt:["vowels++;", "vowels += 1;", "++vowels;", "vowels = 1 + vowels;"],
+      task:"…add 1 to <code>vowels</code>.",
+      does:"This character is a vowel, so the counter goes up by 1.",
+      hint:"Pattern: <code>vowels = vowels + 1;</code>",
+      checks:[[/^int\s+vowels/, "<code>vowels</code> already exists. Do not write <code>int</code> again."], [/^vowels\s*\+\s*1\s*;?$/, "That works the answer out but does not store it. Write <code>vowels = vowels + 1;</code>"]]},
+    {k:"line", d:2, code:`Console.WriteLine("Vowels: " + vowels);`,
+      task:"After the loop has finished: print <code>Vowels: </code> followed by <code>vowels</code>.",
+      does:"This comes after the loop so the total prints once, when every character has been checked.",
+      hint:"Join text and a variable with <code>+</code>. Note the space before the closing quote.",
+      checks:[[/"Vowels:"\s*\+/, "Add a space before the closing quote: <code>\"Vowels: \"</code>."], [/"vowels"\s*\)/, "<code>vowels</code> is a variable, so no quote marks round it."], ...PRINT]}
+   ]},
+
+ /* ---------------- E: challenge ---------------- */
+ { id:"E1", sec:"E", title:"Email Checker", marks:6, type:"WRITE",
+   q:"Write a program that keeps asking for an email address until it contains an <code>@</code>. Each time the email has <b>no</b> <code>@</code>, print <code>Invalid email</code> and read another one. When it has an <code>@</code>, print the part <b>before</b> the <code>@</code> as the username and the part <b>after</b> it as the domain.",
+   eg:{inp:["adaeltham.org","ada@eltham.org"], out:"Invalid email\nUsername: ada\nDomain: eltham.org"},
+   howto:"<b>Seven lines</b> in two halves. First a <code>while</code> loop that will not let go until the email has an <code>@</code>. Then, after the loop, cut the email in two at the <code>@</code>.",
+   rows:[...HEAD,
+    {k:"line", d:2, code:"string email = Console.ReadLine();",
+      task:"Read the first email typed in and store it in a <code>string</code> variable called <code>email</code>.",
+      does:"The first email has to be read <b>before</b> the loop, so the loop has something to check.",
+      hint:"Pattern: <code>string name = Console.ReadLine();</code>",
+      checks:[[/^email\s*=/, "This is a new variable, so start with its type: <code>string email = …</code>"], [/Convert\.ToInt32/, "An email is text, so do not convert it to a number."]]},
+    {k:"line", d:2, code:`while (email.IndexOf("@") == -1)`, alt:[`while (email.IndexOf("@") < 0)`, `while (email.IndexOf('@') == -1)`, `while (email.IndexOf('@') < 0)`, `while (!email.Contains("@"))`, `while (email.Contains("@") == false)`, `while (-1 == email.IndexOf("@"))`],
+      task:"Start a <code>while</code> loop that keeps going while <code>email.IndexOf(\"@\")</code> is equal to <code>-1</code>.",
+      does:"<code>IndexOf(\"@\")</code> gives the index of the <code>@</code>, or <b>-1</b> when there is none. So this means \"keep going while the email has no @\".",
+      hint:"<code>while (email.IndexOf(\"@\") == -1)</code> with no semicolon.",
+      checks:[[/!=\s*-\s*1/, "<code>!= -1</code> would repeat while the email is <b>valid</b>. Keep going while there is <b>no</b> @: <code>== -1</code>."], [/^if\b/, "It has to keep asking, so this is a <code>while</code>, not an <code>if</code>."], [/IndexOf\s*\(\s*@\s*\)/, "The <code>@</code> is text, so it needs quotes: <code>\"@\"</code>."], [/==\s*0\s*\)/, "0 would mean the @ is the very first character. \"Not found\" is <code>-1</code>."], [/\.indexOf|\.Indexof/, "Capital I and capital O: <code>IndexOf</code>."]]},
+    {k:"line", d:3, code:`Console.WriteLine("Invalid email");`,
+      task:"Inside the loop: print <code>Invalid email</code>.",
+      does:"We are only inside the loop when the email has no <code>@</code>, so this is the moment to say it is invalid.",
+      hint:"Capital I, small e, one space.", checks:PRINT},
+    {k:"line", d:3, code:"email = Console.ReadLine();",
+      task:"Still inside the loop: read another email and store it in <code>email</code>.",
+      does:"Without this line <code>email</code> would never change and the loop would run for ever. The loop then checks the new email.",
+      hint:"<code>email</code> already exists, so no type at the start.",
+      checks:[[/^string\s+email/, "<code>email</code> already exists. Do not write <code>string</code> again, just give it a new value."]]},
+    {k:"line", d:2, code:`int at = email.IndexOf("@");`, alt:[`int at = email.IndexOf('@');`],
+      task:"After the loop has finished: create an <code>int</code> variable called <code>at</code> and store the index of the <code>@</code> in it.",
+      does:"The loop has ended, so the email must contain an <code>@</code>. Remember where it is, ready to cut the email in two.",
+      hint:"Pattern: <code>int at = email.IndexOf(\"@\");</code>",
+      checks:[[/^string\s+at/, "An index is a whole number, so the type is <code>int</code>."], [/^at\s*=/, "This is a new variable, so start with its type: <code>int at = …</code>"], [/IndexOf\s*\(\s*@\s*\)/, "The <code>@</code> is text, so it needs quotes: <code>\"@\"</code>."]]},
+    {k:"line", d:2, code:`Console.WriteLine("Username: " + email.Substring(0, at));`,
+      task:"Print <code>Username: </code> followed by the part of <code>email</code> that starts at index 0 and is <code>at</code> characters long.",
+      does:"<code>Substring(start, howMany)</code>. The <code>@</code> is at index <code>at</code>, so there are exactly <code>at</code> characters in front of it. For <code>ada@eltham.org</code>, <code>at</code> is 3 and the username is 3 characters.",
+      hint:"<code>email.Substring(0, at)</code>",
+      checks:[[/Substring\s*\(\s*at\s*\)/, "<code>Substring(at)</code> starts <b>at</b> the @ and goes to the end. The username starts at 0 and is <code>at</code> characters long: <code>Substring(0, at)</code>."], [/Substring\s*\(\s*0\s*,\s*at\s*[-+]\s*1/, "Take exactly <code>at</code> characters. If the @ is at index 3 there are 3 characters before it."], [/Substring\s*\(\s*1\s*,/, "The first character is index 0."], [/"Username:"\s*\+/, "Add a space before the closing quote: <code>\"Username: \"</code>."], ...PRINT]},
+    {k:"line", d:2, code:`Console.WriteLine("Domain: " + email.Substring(at + 1));`, alt:[`Console.WriteLine("Domain: " + email.Substring(1 + at));`, `Console.WriteLine("Domain: " + email.Substring(at + 1, email.Length - at - 1));`],
+      task:"Print <code>Domain: </code> followed by the part of <code>email</code> that starts one place <b>after</b> the <code>@</code> and goes to the end.",
+      does:"<code>Substring</code> with one number takes everything from that index to the end. <code>at + 1</code> skips over the <code>@</code> itself, the same fix as in B4.",
+      hint:"<code>email.Substring(at + 1)</code>",
+      checks:[[/Substring\s*\(\s*at\s*\)/, "<code>Substring(at)</code> starts <b>at</b> the @, so the domain would begin with <code>@</code>. Start one place later: <code>at + 1</code>."], [/at\s*-\s*1/, "<code>at - 1</code> goes back into the username. Go forwards one place: <code>at + 1</code>."], [/"Domain:"\s*\+/, "Add a space before the closing quote: <code>\"Domain: \"</code>."], ...PRINT]}
+   ]}
+];
+
+const GROUPS = [
+  ["A", "Section A · Multiple choice", "1 mark each. The answer is given and explained. Read the explanation, then answer the new question underneath to show you understand."],
+  ["B", "Section B · Debug", "The lines in red boxes are the ones to change. Read why each one is wrong, then type the corrected line."],
+  ["C", "Section C · Complete the code", "Most of the program was given to you. Type only the missing lines."],
+  ["D", "Section D · Write a program", "Build the whole program one line at a time. Each box tells you what to type and what that line does."],
+  ["E", "Section E · Challenge", "The same idea as Section D, with a loop and string cutting working together."]
+];
+const ALL = [...MCQ.map(m => ({...m, sec:"A", mc:true})), ...TASKS];
+
+/* ============================================================ build page */
+const app = $("#app");
+function hl(src){
+  const out = []; const re = /("(?:[^"\\]|\\.)*"?|'(?:[^'\\]|\\.)*'?)|([A-Za-z_][A-Za-z0-9_]*)|(\d+(?:\.\d+)?)|(\s+)|(.)/g; let m;
+  while ((m = re.exec(src))){
+    if (m[1]) out.push([m[1], "s"]);
+    else if (m[2]){ const w = m[2], after = src.slice(re.lastIndex).trimStart();
+      out.push([w, KW.has(w) ? "k" : (w === "Console" || w === "System" || w === "Program" || w === "Convert") ? "t" : after[0] === "(" ? "f" : ""]); }
+    else if (m[3]) out.push([m[3], "n"]);
+    else out.push([m[0], ""]);
+  }
+  return out.map(([t, kind]) => kind ? `<span class="${kind}">${esc(t)}</span>` : esc(t)).join("");
+}
+const codeBlock = (src, cls = "small") => `<div class="code ${cls}">${src.split("\n").map(l => `<div class="cl"><span class="src">${l ? hl(l) : " "}</span></div>`).join("")}</div>`;
+const L = "ABCD";
+
+$("#chips").innerHTML = ALL.map(q => `<a class="chip" href="#${q.id}" data-chip="${q.id}">${q.id}</a>`).join("");
+
+function sectionShell(q, pills, body){
+  const sec = document.createElement("section");
+  sec.className = "act shut"; sec.id = q.id;
+  sec.innerHTML = `<header><span class="num">${q.id}</span><h2><button type="button" data-toggle="${q.id}" aria-expanded="false">${esc(q.title)}</button></h2>${pills}<span class="badge" id="badge-${q.id}"></span></header><div class="secbody">${body}</div>`;
+  app.appendChild(sec);
+  return sec;
+}
+
+GROUPS.forEach(([g, name, note]) => {
+  app.insertAdjacentHTML("beforeend", `<h2 class="group">${name}</h2><p class="groupnote">${note}</p>`);
+  if (g === "A") MCQ.forEach(q => {
+    sectionShell(q, `<span class="pill">1 MARK</span><span class="pill navy">MULTIPLE CHOICE</span>`, `
+      <p class="qtext">${q.prompt}</p>
+      ${codeBlock(q.code)}
+      <div class="opts">${q.opts.map((o, i) => `<div class="opt${i === q.ans ? " correct" : ""}"><b>${L[i]}</b><code>${esc(o)}</code>${i === q.ans ? " ✓" : ""}</div>`).join("")}</div>
+      <div class="answer"><p class="ans">The answer is ${L[q.ans]}: ${esc(q.opts[q.ans])}</p>${q.explain}<p class="enter">On CodeBash: change <code>?</code> to <code>${L[q.ans]}</code> (a capital letter, inside the quote marks).</p></div>
+      <div class="tryq"><h3>Now try this one</h3><p class="qtext">${q.alt.prompt} Use the explanation above to work it out, then click your answer.</p>
+        ${codeBlock(q.alt.code)}
+        <div class="opts">${q.alt.opts.map(([o], i) => `<button class="opt" type="button" data-mc="${q.id}" data-i="${i}"><b>${L[i]}</b><code>${esc(o)}</code></button>`).join("")}</div>
+        <div class="fb" id="mcfb-${q.id}" aria-live="polite"></div></div>`);
+  });
+  else TASKS.filter(T => T.sec === g).forEach(buildTask);
+});
+app.insertAdjacentHTML("beforeend", `<div class="status"><span>Your work is saved in this browser as you go.</span><button class="btn ghost" type="button" id="reset">Clear my answers</button></div>`);
+
+function buildTask(T){
+  T.lines = T.rows.filter(r => r.k === "line");
+  T.lines.forEach((r, i) => { r.key = `${T.id}-${i}`; r.no = i + 1; });
+  const debug = T.type === "DEBUG";
+  const sec = sectionShell(T, `<span class="pill">${T.marks} MARKS</span><span class="pill ${debug ? "must" : T.type === "COMPLETE" ? "model" : "navy"}">${T.type}</span>`, `
+    <div class="twocol">
+      <div><p class="qtext">${T.q}</p><p class="howto" style="margin:0">${T.howto}</p></div>
+      <div class="eg"><h3>Example</h3><div class="console">${T.eg.inp.map(x => `<span class="in">${esc(x)}</span>`).join("\n")}\n${esc(T.eg.out)}</div><p class="cap">Green is typed in. White is what the program prints.</p></div>
+    </div>
+    <div class="rules"><span>Type one line per box</span><span>Press Enter to check</span><span>No { } for blocks</span><span>Capital letters matter</span></div>
+    <div class="rows"></div>
+    <div class="prog">
+      <div class="proghead"><h3>${debug ? "The whole program" : "Your whole program"}</h3><div class="legend"><span><i style="color:var(--gold5)">{ }</i> added for you</span>${debug ? `<span><i style="color:#FF8A80">▌</i> still buggy</span>` : ""}<span><i style="color:var(--muted)">//</i> still to write</span></div></div>
+      <div class="code" id="code-${T.id}" aria-live="polite"></div>
+      <div class="donebar" id="done-${T.id}"><p><strong>${debug ? "Program fixed." : "Program built."}</strong> Read it through once from top to bottom. Then copy it into CodeBash question <b>${T.id}</b>, press Run Tests and check every test passes.</p><button class="btn gold" type="button" data-copy="${T.id}">Copy code</button></div>
+    </div>`);
+  const box = $(".rows", sec);
+  T.rows.forEach(r => {
+    if (r.k === "blank") return;
+    const div = document.createElement("div");
+    const pad = "··".repeat(Math.max(0, r.d - 2));
+    if (r.k === "given"){
+      if (r.d < 2) return;                       // using / class / Main appear in the program view only
+      div.className = "row given";
+      div.innerHTML = `<span class="ln" aria-hidden="true">✓</span><div class="main"><div class="givencode"><span class="indent" aria-hidden="true">${pad}</span>${esc(r.code)}</div></div>`;
+    } else {
+      div.className = "row" + (r.was || r.missing ? " bug" : ""); div.id = "row-" + r.key;
+      div.innerHTML = `<span class="ln">${r.no}</span><div class="main">
+        ${r.was ? `<span class="buglabel">Change this line</span><div class="bugline">${esc(r.was)}</div>` : ""}
+        ${r.missing ? `<span class="buglabel">A line is missing here</span>` : ""}
+        ${r.why ? `<div class="why"><b>Why it is wrong:</b> ${r.why}</div>` : ""}
+        <div class="task">${r.task}</div>
+        ${r.does ? `<div class="does"><b>WHAT IT DOES</b>${r.does}</div>` : ""}
+        <div class="entry"><span class="indent" aria-hidden="true">${pad}</span><input type="text" id="in-${r.key}" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="${T.id} line ${r.no}" placeholder="${r.was ? "type the corrected line here" : r.missing ? "type the missing line here" : `type line ${r.no} here`}">
+        <button class="btn" type="button" data-check="${r.key}">Check</button>
+        <button class="btn ghost" type="button" data-hint="${r.key}" ${r.hint ? "" : "hidden"}>Hint</button>
+        <button class="btn model" type="button" data-model="${r.key}">▶ Model</button></div>
+        <div class="hintbox" id="hint-${r.key}" hidden>${r.hint || ""}</div>
+        <div class="fb" id="fb-${r.key}" aria-live="polite"></div></div>`;
+    }
+    box.appendChild(div);
+  });
+}
+
+/* ============================================================ state + render */
+const findLine = key => { for (const T of TASKS) for (const r of T.lines) if (r.key === key) return [T, r]; };
+const isRight = r => !!S.ans[r.key] && check(r, S.ans[r.key]).ok;
+const taskDone = T => T.lines.every(isRight);
+const mcDone = q => S.mc[q.id] === q.alt.ans;
+const qDone = q => q.mc ? mcDone(q) : taskDone(q);
+
+/* assemble the full program, adding braces from the depth changes */
+function assemble(T, cur){
+  const out = [], stack = [];
+  const items = T.rows;
+  const pad = d => "    ".repeat(d);
+  const closeTo = d => { while (stack.length && stack[stack.length - 1] >= d){ const x = stack.pop(); out.push({txt: pad(x) + "}", brace: true}); } };
+  items.forEach((r, i) => {
+    const next = items.slice(i + 1).find(x => x.k !== "blank");
+    if (r.k === "blank"){ if (next) closeTo(next.d); out.push({txt: ""}); return; }
+    closeTo(r.d);
+    if (r.k === "given") out.push({txt: pad(r.d) + r.code});
+    else if (isRight(r)) out.push({txt: pad(r.d) + matched(r, S.ans[r.key])});
+    else if (r.was) out.push({txt: pad(r.d) + r.was, bug: true});
+    else out.push({txt: pad(r.d) + `// line ${r.no}: ${plain(r.task)}`, ph: true, cur: T.lines.indexOf(r) === cur});
+    if (next && next.d > r.d){ out.push({txt: pad(r.d) + "{", brace: true}); stack.push(r.d); }
+  });
+  closeTo(0);
+  return out;
+}
+const plain = h => { const d = document.createElement("div"); d.innerHTML = h; let t = d.textContent.replace(/\s+/g, " ").trim(); return t.length > 70 ? t.slice(0, 67) + "…" : t; };
+function renderCode(T, cur){
+  $(`#code-${T.id}`).innerHTML = assemble(T, cur).map((l, i) =>
+    `<div class="cl${l.cur ? " cur" : ""}${l.bug ? " bugl" : ""}"><span class="g">${i + 1}</span><span class="src">${l.brace ? `<span class="br">${esc(l.txt)}</span>` : l.ph ? `<span class="ph">${esc(l.txt)}</span>` : hl(l.txt)}</span></div>`).join("");
+}
+const codeText = T => assemble(T, -1).map(l => l.txt).join("\n") + "\n";
+
+function renderTask(T){
+  let firstOpen = -1;
+  T.lines.forEach((r, i) => {
+    const row = $("#row-" + r.key), inp = $("#in-" + r.key), ok = isRight(r);
+    if (document.activeElement !== inp) inp.value = S.ans[r.key] || "";
+    const reachable = i === 0 || isRight(T.lines[i - 1]) || ok || !!r.was || !!r.missing;   // bug fixes can be done in any order
+    if (!ok && firstOpen < 0 && reachable) firstOpen = i;
+    row.classList.toggle("waiting", !reachable);
+    inp.disabled = !reachable;
+    $(`[data-check="${r.key}"]`).disabled = !reachable;
+    row.classList.toggle("right", ok);
+    if (ok) row.classList.remove("wrong");
+  });
+  const done = taskDone(T), got = T.lines.filter(isRight).length, b = $("#badge-" + T.id);
+  const noun = T.type === "DEBUG" ? "fixes" : "lines";
+  b.textContent = done ? (T.type === "DEBUG" ? "✓ Program fixed" : "✓ Program built") : `${got} of ${T.lines.length} ${T.lines.length === 1 ? noun.slice(0, -1) : noun}`;
+  b.className = "badge" + (done ? " done" : "");
+  $("#done-" + T.id).classList.toggle("on", done);
+  renderCode(T, firstOpen);
+}
+function renderMc(q){
+  const pick = S.mc[q.id], done = pick === q.alt.ans, fb = $("#mcfb-" + q.id);
+  $$(`[data-mc="${q.id}"]`).forEach(b => {
+    const i = +b.dataset.i;
+    b.classList.toggle("correct", done && i === q.alt.ans);
+    b.classList.toggle("wrongpick", !done && pick === i);
+    b.disabled = done;
+  });
+  if (pick === undefined){ fb.textContent = ""; fb.className = "fb"; }
+  else { fb.textContent = (done ? "✓ Correct. " : "Not yet. ") + q.alt.opts[pick][1] + (done ? "" : " Try again."); fb.className = "fb " + (done ? "good" : "bad"); }
+  const b = $("#badge-" + q.id); b.textContent = done ? "✓ Corrected" : "Read, then try the new question"; b.className = "badge" + (done ? " done" : "");
+}
+function renderOverall(){
+  const n = ALL.filter(qDone).length;
+  ALL.forEach(q => $(`[data-chip="${q.id}"]`).classList.toggle("done", qDone(q)));
+  const o = $("#overall"); o.textContent = `${n} of ${ALL.length} corrected`; o.className = "badge" + (n === ALL.length ? " done" : "");
+}
+function renderAll(){ TASKS.forEach(renderTask); MCQ.forEach(renderMc); renderOverall(); }
+
+/* open / close question cards */
+function setOpen(id, open, remember = true){
+  const sec = document.getElementById(id); if (!sec) return;
+  sec.classList.toggle("shut", !open);
+  $(`[data-toggle="${id}"]`).setAttribute("aria-expanded", String(open));
+  if (remember){ S.open[id] = open; save(); }
+}
+ALL.forEach(q => setOpen(q.id, !!S.open[q.id], false));
+function openFromHash(){ const id = location.hash.slice(1); if (ALL.some(q => q.id === id)){ setOpen(id, true); document.getElementById(id).scrollIntoView({block:"start"}); } }
+addEventListener("hashchange", openFromHash);
+
+/* ============================================================ interaction */
+function doCheck(key, moveOn){
+  const [T, r] = findLine(key), inp = $("#in-" + key), fb = $("#fb-" + key), row = $("#row-" + key);
+  S.ans[key] = inp.value; save();
+  const res = check(r, inp.value);
+  fb.innerHTML = res.msg; fb.className = "fb " + (res.ok ? "good" : "bad");
+  row.classList.toggle("wrong", !res.ok); row.classList.toggle("right", res.ok);
+  if (!res.ok){ S.tries[key] = (S.tries[key] || 0) + 1; save(); if (S.tries[key] >= 3 && r.hint) $("#hint-" + key).hidden = false; }
+  renderTask(T); renderOverall();
+  if (res.ok && moveOn){
+    const nx = T.lines[T.lines.indexOf(r) + 1];
+    if (nx && !isRight(nx)) setTimeout(() => $("#in-" + nx.key).focus(), 60);
+  }
+}
+document.addEventListener("click", e => {
+  const t = e.target;
+  const chip = t.closest("[data-chip]"); if (chip){ setOpen(chip.dataset.chip, true); return; }
+  const tog = t.closest("[data-toggle]"); if (tog){ const id = tog.dataset.toggle; setOpen(id, document.getElementById(id).classList.contains("shut")); return; }
+  const all = t.closest("[data-all]"); if (all){ ALL.forEach(q => setOpen(q.id, all.dataset.all === "open")); return; }
+  const c = t.closest("[data-check]"); if (c){ doCheck(c.dataset.check, true); return; }
+  const h = t.closest("[data-hint]"); if (h){ const b = $("#hint-" + h.dataset.hint); b.hidden = !b.hidden; return; }
+  const m = t.closest("[data-model]"); if (m){ const [, r] = findLine(m.dataset.model); const inp = $("#in-" + r.key); inp.disabled = false; inp.value = r.code; doCheck(r.key, false); return; }
+  const mc = t.closest("[data-mc]"); if (mc){ const q = MCQ.find(x => x.id === mc.dataset.mc); S.mc[q.id] = +mc.dataset.i; save(); renderMc(q); renderOverall(); return; }
+  const cp = t.closest("[data-copy]"); if (cp){ copy(codeText(TASKS.find(x => x.id === cp.dataset.copy)), cp); return; }
+  if (t.id === "reset" && confirm("Clear every answer on this page and start again?")){ const keep = {who: S.who, cls: S.cls}; S = {ans:{}, tries:{}, mc:{}, open:{}, ...keep}; save(); $$(".fb").forEach(f => { f.textContent = ""; f.className = "fb"; }); $$(".row").forEach(r => r.classList.remove("wrong")); $$(".hintbox").forEach(h => h.hidden = true); ALL.forEach(q => setOpen(q.id, false, false)); renderAll(); scrollTo(0, 0); }
+});
+document.addEventListener("keydown", e => {
+  if (e.key === "Enter" && e.target.id && e.target.id.startsWith("in-")){ e.preventDefault(); doCheck(e.target.id.slice(3), true); }
+});
+function copy(text, btn){
+  const done = () => { const o = btn.textContent; btn.textContent = "Copied ✓"; setTimeout(() => btn.textContent = o, 1500); };
+  const fallback = () => { const ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); done(); } catch (e) {} ta.remove(); };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fallback); else fallback();
+}
+for (const id of ["who", "cls"]){ const el = $("#" + id); el.value = S[id] || ""; el.addEventListener("input", () => { S[id] = el.value; save(); }); }
+
+renderAll();
+openFromHash();
+</script>
+</body>
+</html>
