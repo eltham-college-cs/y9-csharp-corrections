@@ -182,7 +182,39 @@ button.opt:disabled{cursor:default;box-shadow:none}
   .indent{display:none}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
-@media print{section.act.shut .secbody{display:block}button.btn,.jump{display:none}}
+.pdfnote{font-size:13px;color:var(--navy1);align-self:center;max-width:30ch}
+.printmeta,.printval{display:none}
+/* Export to PDF = the browser's print window with this layout. Only the questions a student has
+   opened or started are included (everything, if nothing has been started or in teacher mode). */
+@page{margin:12mm}
+@media print{
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{background:#fff;font-size:13px}
+  .wrap{max-width:none;padding:0}
+  header.top{margin-bottom:12px}
+  header.top .wrap{padding:14px 16px}
+  header.top h1{font-size:28px;margin:4px 0 6px}
+  header.top p,.jump,.rules,.status,.teacherbar,button.btn,.pdfnote,.noprint,.indent{display:none!important}
+  .printmeta{display:block;color:var(--gold3);font-weight:700;font-size:13px;margin-top:10px}
+  .idrow{margin-top:8px}
+  h2.group{font-size:20px;margin:16px 0 2px;break-after:avoid}
+  p.groupnote{margin-bottom:8px;break-after:avoid}
+  section.act{padding:10px 14px;margin-bottom:10px;border-color:var(--frame)}
+  section.act.shut .secbody{display:block}
+  section.act>header{break-after:avoid}
+  section.act>header h2{font-size:19px}
+  section.act>header h2 button::before{display:none}
+  .row,.answer,.tryq,.twocol,.donebar,.why,.opts,.strip{break-inside:avoid}
+  .row.waiting{opacity:1}
+  .entry input{display:none}
+  .printval{display:block;flex:1 1 100%;min-height:34px;font-family:var(--mono);font-size:13px;padding:7px 10px;border-radius:8px;border:1.5px solid var(--frame);background:#fff;white-space:pre-wrap;overflow-wrap:anywhere}
+  .row.right .printval{border-color:var(--ok)}
+  .row.wrong .printval{border-color:var(--bad)}
+  .code{overflow:visible;font-size:12.5px}
+  .code .cl{min-width:0}
+  .code .cl .src,.givencode,.bugline,.console{white-space:pre-wrap;overflow-wrap:anywhere;overflow:visible}
+  .strip{overflow:visible}
+}
 </style>
 </head>
 <body>
@@ -193,7 +225,10 @@ button.opt:disabled{cursor:default;box-shadow:none}
   <div class="idrow">
     <label>NAME<input id="who" type="text" autocomplete="off" placeholder="First name and surname"></label>
     <label>CLASS<input id="cls" type="text" autocomplete="off" placeholder="9G"></label>
+    <button class="btn gold" type="button" data-pdf>Export to PDF</button>
+    <span class="pdfnote">Saves the questions you have worked on. In the print window choose <b>Save as PDF</b>.</span>
   </div>
+  <div class="printmeta" id="printmeta"></div>
   <div class="teacherbar" id="teacherbar">Teacher mode: use ▶ Model on any line to type it live. <button class="btn gold" type="button" data-all="open">Open all</button> <button class="btn ghost" type="button" data-all="shut">Close all</button></div>
 </div></header>
 
@@ -727,7 +762,7 @@ function sectionShell(q, pills, body){
 }
 
 GROUPS.forEach(([g, name, note]) => {
-  app.insertAdjacentHTML("beforeend", `<h2 class="group">${name}</h2><p class="groupnote">${note}</p>`);
+  app.insertAdjacentHTML("beforeend", `<h2 class="group" data-g="${g}">${name}</h2><p class="groupnote" data-g="${g}">${note}</p>`);
   if (g === "A") MCQ.forEach(q => {
     sectionShell(q, `<span class="pill">1 MARK</span><span class="pill navy">MULTIPLE CHOICE</span>`, `
       <p class="qtext">${q.prompt}</p>
@@ -741,7 +776,7 @@ GROUPS.forEach(([g, name, note]) => {
   });
   else TASKS.filter(T => T.sec === g).forEach(buildTask);
 });
-app.insertAdjacentHTML("beforeend", `<div class="status"><span>Your work is saved in this browser as you go.</span><button class="btn ghost" type="button" id="reset">Clear my answers</button></div>`);
+app.insertAdjacentHTML("beforeend", `<div class="status"><span>Your work is saved in this browser as you go.</span><button class="btn" type="button" data-pdf>Export to PDF</button><button class="btn ghost" type="button" id="reset">Clear my answers</button></div>`);
 
 function buildTask(T){
   T.lines = T.rows.filter(r => r.k === "line");
@@ -904,6 +939,28 @@ function copy(text, btn){
   const fallback = () => { const ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); done(); } catch (e) {} ta.remove(); };
   if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fallback); else fallback();
 }
+/* ============================================================ export to PDF (browser print) */
+const started = q => q.mc ? S.mc[q.id] !== undefined : q.lines.some(r => (S.ans[r.key] || "").trim());
+const TITLE = document.title;
+function preparePrint(){
+  const shown = q => started(q) || !document.getElementById(q.id).classList.contains("shut");
+  const everything = TEACHER || !ALL.some(shown);
+  ALL.forEach(q => document.getElementById(q.id).classList.toggle("noprint", !(everything || shown(q))));
+  $$("[data-g]").forEach(el => el.classList.toggle("noprint", !ALL.some(q => q.sec === el.dataset.g && !document.getElementById(q.id).classList.contains("noprint"))));
+  $$(".entry input").forEach(inp => {
+    let pv = $(".printval", inp.parentElement);
+    if (!pv){ pv = document.createElement("div"); pv.className = "printval"; inp.after(pv); }
+    pv.textContent = inp.value || " ";
+  });
+  const when = new Date().toLocaleDateString("en-GB", {day:"numeric", month:"long", year:"numeric"});
+  $("#printmeta").textContent = `${ALL.filter(qDone).length} of ${ALL.length} questions corrected · ${when}`;
+  const who = [S.who, S.cls].filter(Boolean).join(" ").trim();
+  document.title = "Y9 C# Corrections" + (who ? " - " + who : "");      // becomes the PDF file name
+}
+addEventListener("beforeprint", preparePrint);
+addEventListener("afterprint", () => { document.title = TITLE; });
+document.addEventListener("click", e => { if (e.target.closest("[data-pdf]")){ preparePrint(); window.print(); } });
+
 for (const id of ["who", "cls"]){ const el = $("#" + id); el.value = S[id] || ""; el.addEventListener("input", () => { S[id] = el.value; save(); }); }
 
 renderAll();
